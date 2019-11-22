@@ -1,6 +1,5 @@
 package main
 
-
 // Use tcpdump to create a test file
 // tcpdump -w test.pcap
 // or use the example above for writing pcap files
@@ -31,19 +30,19 @@ func macprocess(mac string) string {
 	return str
 }
 
-func findurl(date string) (Url, Ua string){
+func findurl(date string) (Url, Ua string) {
 	urlitems := strings.Split(date, " ")
 	if 2 > len(urlitems) {
 		fmt.Println("urlitems < 2")
-		return "",""
+		return "", ""
 	}
 	domain := strings.Split(urlitems[3], "\r\n")
-	path := strings.Replace(urlitems[1], "\u0026", "/", -1)
+	path := strings.Replace(urlitems[1], "\u0026", "&", -1)
 	Url = "http://" + domain[0] + path
-	tmp := strings.Split(urlitems[4] ,"\r\n")
+	tmp := strings.Split(urlitems[4], "\r\n")
 	Ua = tmp[0]
 
-	return Url,Ua
+	return Url, Ua
 }
 
 func printPacketInfo(packet gopacket.Packet) {
@@ -151,12 +150,12 @@ func writePacketjson(packet gopacket.Packet, file_fd *os.File) {
 
 		// Search for a string inside the payload
 		if strings.Contains(string(applicationLayer.Payload()), "HTTP") {
-			tmpdate.Url,tmpdate.Ua = findurl(string(applicationLayer.Payload()))
+			tmpdate.Url, tmpdate.Ua = findurl(string(applicationLayer.Payload()))
 			fmt.Println(tmpdate.Url, tmpdate.Ua)
 		}
 	}
 
-	tmpdate.Time = fmt.Sprintf("%d",time.Now().UnixNano())
+	tmpdate.Time = fmt.Sprintf("%d", time.Now().UnixNano())
 	fmt.Println(tmpdate.Time)
 	// Check for errors
 	if err := packet.ErrorLayer(); err != nil {
@@ -169,7 +168,9 @@ func writePacketjson(packet gopacket.Packet, file_fd *os.File) {
 func main() {
 	// Open file instead of device
 	handle, err = pcap.OpenOffline(pcapFile)
-	if err != nil { log.Fatal(err) }
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer handle.Close()
 
 	file_fd, err := os.Create(filename)
@@ -188,4 +189,3 @@ func main() {
 	}
 
 }
-
